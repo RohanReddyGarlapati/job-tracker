@@ -17,9 +17,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# NOTE: .env is intentionally committed for this demo — it only points Prisma at
-# a local SQLite file and contains no secrets. In a real app, ignore it instead:
-# .env*
+# environment variables
+.env*
+!.env.example
 
 # typescript
 *.tsbuildinfo
