@@ -1,0 +1,30 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# NOTE: .env is intentionally committed for this demo — it only points Prisma at
+# a local SQLite file and contains no secrets. In a real app, ignore it instead:
+# .env*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# SQLite database file — regenerated locally with `npm run db:migrate` + `npm run db:seed`
+/prisma/dev.db
+/prisma/dev.db-journal
