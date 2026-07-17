@@ -138,27 +138,24 @@ Useful scripts:
 
 ## Deploying to Vercel
 
-> **Important:** SQLite **will not work on Vercel**. Serverless functions run on
-> a read-only, ephemeral filesystem — the `dev.db` file can't be written to
-> reliably, and instances don't share it. Local-only. Swap the datasource before
-> deploying (the app code itself needs no changes):
+The app runs on Postgres (Vercel Storage → Neon) rather than the SQLite file
+used in early local prototyping — Vercel's serverless functions have a
+read-only, ephemeral filesystem, so a file-based `dev.db` can't be written to
+reliably in production.
 
-**Option A — Turso (libSQL): closest to SQLite**
-
-1. `turso db create job-tracker` and get the URL + auth token.
-2. Use Prisma's driver adapter for libSQL (`@prisma/adapter-libsql`, `@libsql/client`) and set `DATABASE_URL` / auth token as Vercel env vars.
-3. Push the schema (`npx prisma db push`) and reseed.
-
-**Option B — Postgres (Vercel Postgres / Neon / Supabase)**
-
-1. Provision a Postgres database and copy the connection string.
-2. In `prisma/schema.prisma` change `provider = "sqlite"` → `"postgresql"`.
-3. Set `DATABASE_URL` in the Vercel project settings.
-4. Run `npx prisma migrate deploy` (creates tables from the tracked migrations) and reseed against the remote DB.
-
-Then push to GitHub and import the repo in Vercel — no other config needed:
-`postinstall` already runs `prisma generate`, and the pages are dynamic
-(`force-dynamic`), so they render per-request.
+1. Vercel dashboard → **Storage** → **Create Database** → **Postgres**. This
+   auto-attaches `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct)
+   to the project's env vars — `prisma/schema.prisma` reads the latter as
+   `directUrl`, since Prisma Migrate needs a direct connection and can't run
+   through a pooler.
+2. Import this repo into the Vercel project (or link it, if the database was
+   created from an already-linked project).
+3. Deploy. The `build` script runs `prisma migrate deploy && next build`, so
+   the tracked migrations in `prisma/migrations/` apply automatically on every
+   deploy — no manual migration step needed.
+4. Optional: reseed the remote DB once by pointing your local `.env` at the
+   production `DATABASE_URL` / `DATABASE_URL_UNPOOLED` and running
+   `npm run db:seed`.
 
 ## Notes & known limitations
 

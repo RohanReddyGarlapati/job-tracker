@@ -1,15 +1,19 @@
 // Job Application Tracker — data model
-// SQLite keeps local setup zero-config (a single file, no DB server).
-// NOTE: SQLite has no native enum type in Prisma, so `status` is a plain String
-// constrained at the application layer (see src/lib/status.ts).
+// Postgres (Neon, via Vercel Storage). `url` is the pooled connection used at
+// runtime; `directUrl` bypasses the pooler for migrations, which Prisma
+// Migrate requires.
+// NOTE: kept `status` as a plain String (see src/lib/status.ts) rather than a
+// Prisma enum, since the values were already validated at the application
+// layer from the SQLite days and a native enum isn't worth a migration churn.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Application {
